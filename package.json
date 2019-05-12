@@ -1,0 +1,11 @@
+{
+  "name": "service-times",
+  "description": "A way to store times",
+  "version": "0.0.1",
+  "repository": {
+    "type": "github",
+    "url": "git@github.com:emptygalaxy/service-times.git"
+  },
+  "license": "ISC",
+  "dependencies": {}
+}
