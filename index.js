@@ -81,20 +81,17 @@ function getServiceLabel(service)
 
 /**
  *
- * @param date
+ * @param {number} time
  * @return {string}
  */
-function getServiceLabelAtTime(date)
+function getServiceLabelAtTime(time)
 {
-    const time = date.getHours() + (date.getMinutes() / 60);
-
     const l = _serviceTimes.length;
     for(let i=0; i<l; i++)
     {
         let serviceTime = _serviceTimes[i];
-
-        let serviceStart = serviceTime - _preserviceDuration;
-        let serviceEnd = serviceTime + _serviceDuration;
+        let serviceStart = getServiceStart(serviceTime);
+        let serviceEnd = getServiceEnd(serviceTime);
 
         if(i === 0 && time < serviceStart)
             return "SU";
@@ -109,13 +106,87 @@ function getServiceLabelAtTime(date)
 }
 
 /**
+ * Converts a Date object to a number (hours)
+ * @param {Date} date
+ * @return {number}
+ */
+function convertDateToTime(date)
+{
+    return date.getHours() + (date.getMinutes() / 60);
+}
+
+/**
+ * Get service start time (in hours)
+ * @param {number} serviceTime
+ * @return {number}
+ */
+function getServiceStart(serviceTime)
+{
+    return serviceTime - _preserviceDuration;
+}
+
+/**
+ * Get service end time (in hours)
+ * @param {number} serviceTime
+ * @return {number}
+ */
+function getServiceEnd(serviceTime)
+{
+    return serviceTime + _serviceDuration;
+}
+
+/**
+ * Check if given time is during a service
+ * @param {number} time
+ * @param {number} serviceTime
+ * @return {boolean}
+ */
+function checkTimeIsInService(time, serviceTime)
+{
+    let serviceStart = getServiceStart(serviceTime);
+    let serviceEnd = getServiceEnd(serviceTime);
+
+    return (time > serviceStart && time < serviceEnd);
+}
+
+/**
+ * Check if given time is in any of the services
+ * @param {number} time
+ * @return {boolean}
+ */
+function checkTimeIsInAnyService(time)
+{
+    const l = _serviceTimes.length;
+    for(let i=0; i<l; i++)
+    {
+        let serviceTime = _serviceTimes[i];
+        if(checkTimeIsInService(time, serviceTime))
+            return true;
+    }
+
+    return false;
+}
+
+/**
+ * Check if the current time is part of any of the services
+ * @return {boolean}
+ */
+function checkCurrentlyInService()
+{
+    const now = new Date();
+    const time = convertDateToTime(now);
+    return checkTimeIsInAnyService(time);
+}
+
+/**
  * Get current service label
  * @return {string}
  */
 function getCurrentServiceLabel()
 {
     const now = new Date();
-    return getServiceLabelAtTime(now);
+    const time = convertDateToTime(now);
+    return getServiceLabelAtTime(time);
 }
 
 /**
@@ -152,3 +223,4 @@ exports.setLocationName = setLocationName;
 exports.getCurrentLabel = getCurrentLabel;
 exports.getServiceLabelAtTime = getServiceLabelAtTime;
 exports.getCurrentServiceLabel = getCurrentServiceLabel;
+exports.checkCurrentlyInService = checkCurrentlyInService;
